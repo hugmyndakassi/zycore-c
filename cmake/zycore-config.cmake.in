@@ -2,7 +2,5 @@ set(zycore_VERSION @PROJECT_VERSION@)
 
 @PACKAGE_INIT@
 
-set_and_check(zycore_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@")
-set_and_check(zycore_LIB_DIR "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@")
-
-check_required_components(zycore)
+include("${CMAKE_CURRENT_LIST_DIR}/@TARGETS_EXPORT_NAME@.cmake")
+check_required_components("@PROJECT_NAME@")

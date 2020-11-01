@@ -3,11 +3,12 @@ if (TARGET Zycore)
 endif ()
 
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+project(Zycore VERSION 1.0.0.0 LANGUAGES C CXX)
+
 include(GenerateExportHeader)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-project(Zycore VERSION 1.0.0.0 LANGUAGES C CXX)
 
 # =============================================================================================== #
 # Overridable options                                                                             #
@@ -191,23 +192,78 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND NOT ZYAN_NO_LIBC)
     target_link_libraries("Zycore" Threads::Threads)
 endif ()
 
-configure_package_config_file(cmake/zycore-config.cmake.in
+# =============================================================================================== #
+# Install rules                                                                                   #
+# =============================================================================================== #
+
+set(_config_install_dir "${CMAKE_INSTALL_PREFIX}/cmake")
+set(TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
+
+# write_basic_package_version_file(
+#     "${version_config}" COMPATIBILITY SameMajorVersion
+# )
+
+configure_package_config_file(
+    "cmake/zycore-config.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/zycore-config.cmake"
-    INSTALL_DESTINATION "${CMAKE_INSTALL_PREFIX}/cmake"
-)
-install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/zycore-config.cmake"
-    DESTINATION "${CMAKE_INSTALL_PREFIX}/cmake"
+    INSTALL_DESTINATION "${_config_install_dir}"
 )
 
-install(TARGETS "Zycore"
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES
+# Targets
+install(
+    TARGETS "Zycore"
+    EXPORT "${TARGETS_EXPORT_NAME}"
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    # INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+)
+
+# Headers
+install(
+    DIRECTORY
+    "include/"
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+# Export headers
+install(
+    FILES
     "${PROJECT_BINARY_DIR}/ZycoreExportConfig.h"
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
-install(DIRECTORY "include/" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+)
+
+# Config
+install(
+    FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/zycore-config.cmake"
+    DESTINATION "${_config_install_dir}"
+)
+
+# Config
+install(
+    EXPORT "${TARGETS_EXPORT_NAME}"
+    NAMESPACE "zycore::"
+    DESTINATION "${_config_install_dir}"
+)
+
+# configure_package_config_file(cmake/zycore-config.cmake.in
+#     "${CMAKE_CURRENT_BINARY_DIR}/zycore-config.cmake"
+#     INSTALL_DESTINATION "${CMAKE_INSTALL_PREFIX}/cmake"
+# )
+# install(FILES
+#     "${CMAKE_CURRENT_BINARY_DIR}/zycore-config.cmake"
+#     DESTINATION "${CMAKE_INSTALL_PREFIX}/cmake"
+# )
+
+# install(TARGETS "Zycore"
+#     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+# install(FILES
+#     "${PROJECT_BINARY_DIR}/ZycoreExportConfig.h"
+#     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+# install(DIRECTORY "include/" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # =============================================================================================== #
 # Developer mode                                                                                  #
